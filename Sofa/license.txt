@@ -1,0 +1,11 @@
+Model Information:
+* title:	Elm low poly sofa
+* source:	https://sketchfab.com/3d-models/elm-low-poly-sofa-f36f413e0ab04b9aabee09eea288002d
+* author:	L_Krajewski (https://sketchfab.com/L_Krajewski)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Elm low poly sofa" (https://sketchfab.com/3d-models/elm-low-poly-sofa-f36f413e0ab04b9aabee09eea288002d) by L_Krajewski (https://sketchfab.com/L_Krajewski) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

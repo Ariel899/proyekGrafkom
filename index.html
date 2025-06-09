@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sofa & TV + Lantai & Atap</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: #ffffff;
+      overflow: hidden;
+      color: #333;
+    }
+    #scene-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    .info-panel {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      width: 360px;
+      border: 1px solid #ddd;
+    }
+    .info-panel h1 {
+      color: #2c3e50;
+      font-size: 24px;
+      margin-bottom: 10px;
+      text-align: center;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #3498db;
+    }
+    .info-content {
+      margin: 10px 0;
+    }
+    .info-content p {
+      margin: 6px 0;
+      line-height: 1.4;
+      color: #555;
+      font-size: 14px;
+    }
+    .scale-container {
+      display: flex;
+      justify-content: space-between;
+      margin: 15px 0;
+      padding: 8px 0;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+    }
+    .scale-item {
+      width: 45%;
+      text-align: center;
+    }
+    .scale-item h3 {
+      color: #2c3e50;
+      margin-bottom: 6px;
+      font-size: 16px;
+    }
+    .scale-value {
+      font-size: 20px;
+      font-weight: bold;
+      color: #3498db;
+      margin: 4px 0;
+    }
+    .slider-container {
+      margin: 10px 0;
+    }
+    .slider-container label {
+      display: block;
+      margin-bottom: 6px;
+      color: #2c3e50;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    input[type="range"] {
+      width: 100%;
+      margin: 8px 0 12px;
+      height: 6px;
+      border-radius: 3px;
+      background: #e0e0e0;
+      outline: none;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    button {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #2980b9;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    }
+    .footer {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      color: #7f8c8d;
+      font-size: 12px;
+      z-index: 100;
+      padding: 6px;
+      background: rgba(255, 255, 255, 0.8);
+    }
+    .status {
+      margin-top: 12px;
+      padding: 8px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 500;
+      color: #2c3e50;
+      border: 1px solid #eee;
+      font-size: 13px;
+    }
+    .light-control {
+      margin-top: 12px;
+      padding: 8px;
+      background: #f1f8ff;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 500;
+      color: #2c3e50;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Container untuk scene 3D -->
+  <div id="scene-container"></div>
+  
+  <!-- Panel informasi -->
+  <div class="info-panel">
+    <h1>SOFA &amp; TV</h1>
+    <div class="info-content">
+      <p>• Scene dengan dinding, lantai, dan atap</p>
+      <p>• Gunakan mouse untuk menggerakkan kamera</p>
+    </div>
+    
+    <!-- Tampilan nilai skala -->
+    <div class="scale-container">
+      <div class="scale-item">
+        <h3>Skala Sofa</h3>
+        <div class="scale-value" id="sofaScaleValue">3.0</div>
+      </div>
+      <div class="scale-item">
+        <h3>Skala TV</h3>
+        <div class="scale-value" id="tvScaleValue">100.0</div>
+      </div>
+      <div class="scale-item">
+        <h3>Skala Pintu</h3>
+        <div class="scale-value" id="doorScaleValue">0.7</div>
+      </div>
+      <div class="scale-item">
+        <h3>Skala Jam</h3>
+        <div class="scale-value" id="clockScaleValue">0.1</div>
+      </div>
+      <div class="scale-item">
+        <h3>Skala AC</h3>
+        <div class="scale-value" id="acScaleValue">108.0</div>
+      </div>
+      <div class="scale-item">
+        <h3>Skala Remote</h3>
+        <div class="scale-value" id="remoteScaleValue">0.20</div>
+      </div>
+      <div class="scale-item">
+        <h3>Skala Kipas</h3>
+        <div class="scale-value" id="fanScaleValue">11.4</div>
+      </div>
+    </div>
+    
+    <!-- Slider untuk mengubah skala -->
+    <div class="slider-container">
+      <label for="sofaScale">Atur Skala Sofa:</label>
+      <input type="range" id="sofaScale" min="0.5" max="10" step="0.1" value="0.7">
+      
+      <label for="tvScale">Atur Skala TV:</label>
+      <input type="range" id="tvScale" min="0.5" max="300" step="0.1" value="174.1">
+
+      <label for="doorScale">Atur Skala Pintu:</label>
+      <input type="range" id="doorScale" min="0.5" max="10" step="0.1" value="0.7">
+
+      <label for="clockScale">Atur Skala Jam:</label>
+      <input type="range" id="clockScale" min="0.05" max="100" step="0.1" value="0.1">
+
+      <label for="acScale">Atur Skala AC:</label>
+      <input type="range" id="acScale" min="0.1" max="200" step="0.1" value="108.0">
+
+      <label for="remoteScale">Atur Skala Remote:</label>
+      <input type="range" id="remoteScale" min="0.05" max="5" step="0.05" value="0.20">
+
+      <label for="fanScale">Atur Skala Kipas:</label>
+      <input type="range" id="fanScale" min="0.1" max="200" step="0.1" value="11.4">
+    </div>
+    
+    <div class="light-control">
+      Kontrol Lampu
+    </div>
+    
+    <div class="controls">
+      <button id="resetBtn">Reset Kamera</button>
+      <button id="toggleLight">Toggle Lampu</button>
+      <button id="toggleFan">Toggle Kipas (M)</button>
+      <button id="toggleAnimation">Jeda/Gerak Kucing</button>
+    </div>
+    
+    <div class="status" id="status">Status: Sofa dimuat</div>
+  </div>
+  
+  <div class="footer">
+    www.goods.com | UK: chatbet | UK: modeli.com | UK: scene7.com
+  </div>
+
+  <!-- Three.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+
+  <script>
+    // ============ Inisialisasi dasar Three.js ============
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xe8ded9);
+
+    // Kamera
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 10000);
+    camera.position.set(0, 50, 150);
+
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      logarithmicDepthBuffer: true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    document.getElementById('scene-container').appendChild(renderer.domElement);
+
+    // Variabel untuk kontrol mouse
+    let isMouseLocked = false;
+    let yaw = 0;
+    let pitch = 0;
+    const mouseSensitivity = 0.002;
+
+    // Event listener untuk mengunci mouse
+    renderer.domElement.addEventListener('click', function() {
+      if (!isMouseLocked) {
+        renderer.domElement.requestPointerLock();
+      }
+    });
+
+    // Event listener untuk mouse movement
+    document.addEventListener('pointerlockchange', function() {
+      isMouseLocked = document.pointerLockElement === renderer.domElement;
+    });
+
+    document.addEventListener('mousemove', function(event) {
+      if (isMouseLocked) {
+        // Update rotasi kamera berdasarkan gerakan mouse
+        yaw -= event.movementX * mouseSensitivity;
+        pitch -= event.movementY * mouseSensitivity;
+        
+        // Batasi rotasi pitch agar tidak bisa melihat terlalu atas/bawah
+        pitch = Math.max(-Math.PI/2, Math.min(Math.PI/2, pitch));
+        
+        // Terapkan rotasi ke kamera
+        camera.rotation.order = 'YXZ';
+        camera.rotation.y = yaw;
+        camera.rotation.x = pitch;
+      }
+    });
+
+    // Variabel untuk kontrol keyboard dan kipas
+    const keyboard = {};
+    let isFanRotating = false;
+    const fanRotationSpeed = 0.1;
+
+    // Event listener untuk keyboard
+    document.addEventListener('keydown', function(event) {
+      keyboard[event.key.toLowerCase()] = true;
+      
+      // Toggle kipas dengan tombol 'm'
+      if (event.key.toLowerCase() === 'm') {
+        toggleFan();
+      }
+    });
+
+    document.addEventListener('keyup', function(event) {
+      keyboard[event.key.toLowerCase()] = false;
+    });
+
+    // Fungsi untuk menggerakkan kamera
+    function updateCamera() {
+      // Dapatkan arah yang kamera hadapi
+      const direction = new THREE.Vector3();
+      camera.getWorldDirection(direction);
+      
+      // Vektor samping (untuk gerakan ke kiri/kanan)
+      const sideways = new THREE.Vector3(-direction.z, 0, direction.x).normalize();
+      
+      // Gerakan maju (W)
+      if (keyboard['w']) {
+        camera.position.add(direction.multiplyScalar(moveSpeed));
+      }
+      // Gerakan mundur (S)
+      if (keyboard['s']) {
+        camera.position.sub(direction.normalize().multiplyScalar(moveSpeed));
+      }
+      // Gerakan ke kiri (A)
+      if (keyboard['a']) {
+        camera.position.sub(sideways.multiplyScalar(moveSpeed));
+      }
+      // Gerakan ke kanan (D)
+      if (keyboard['d']) {
+        camera.position.add(sideways.multiplyScalar(moveSpeed));
+      }
+    }
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(30, 100, 30);
+    dirLight.castShadow = true;
+    scene.add(dirLight);
+
+    // ======================================================
+    // 1. Muat tekstur lantai
+    const textureLoader = new THREE.TextureLoader();
+    // Ganti 'path/to/floor.jpg' dengan path/URL tekstur lantai-mu
+    const albedoTextureFloor1 = textureLoader.load('path/to/floor.jpg');
+    albedoTextureFloor1.wrapS = THREE.RepeatWrapping;
+    albedoTextureFloor1.wrapT = THREE.RepeatWrapping;
+
+    // ======================================================
+    // Fungsi modular untuk membuat satu sisi dinding (segment)
+    function createWallSegment({
+      wallMaterial,
+      segmentWidth,
+      segmentHeight,
+      segmentDepth,
+      direction = 'front',       // 'front' | 'back' | 'left' | 'right'
+      positionOffset = 30,       // Jarak dinding dari pusat (setengah segmentWidth)
+      hasDoor = false,
+      doorWidth = 18,
+      doorHeight = 30,
+      doorYPosition = -100
+    }) {
+      const step = 10; // Ukuran tiap kotak = 10 × 10
+
+      for (let y = 0; y < segmentHeight / step; y++) {
+        for (let x = 0; x < segmentWidth / step; x++) {
+          const posY = y * step + step / 2 - segmentHeight / 2;
+          const posX = x * step + step / 2 - segmentWidth / 2;
+
+          // Jika area pintu → skip segmen
+          if (
+            hasDoor &&
+            posY > doorYPosition - doorHeight / 2 &&
+            posY < doorYPosition + doorHeight / 2 &&
+            posX > -doorWidth / 2 &&
+            posX < doorWidth / 2
+          ) {
+            continue;
+          }
+
+          let geometry, mesh, posVec;
+
+          if (direction === 'front' || direction === 'back') {
+            // Dinding menghadap front/back → tebal di Z (segmentDepth)
+            geometry = new THREE.BoxGeometry(step, step, segmentDepth);
+            posVec = new THREE.Vector3(
+              posX,
+              posY,
+              direction === 'front' ? positionOffset : -positionOffset
+            );
+          } else {
+            // Dinding kiri/kanan → tebal di X (segmentDepth)
+            geometry = new THREE.BoxGeometry(segmentDepth, step, step);
+            posVec = new THREE.Vector3(
+              direction === 'left' ? -positionOffset : positionOffset,
+              posY,
+              posX
+            );
+          }
+
+          mesh = new THREE.Mesh(geometry, wallMaterial);
+          mesh.position.copy(posVec);
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          scene.add(mesh);
+        }
+      }
+    }
+
+    // ======================================================
+    // Fungsi createWalls: memanggil createWallSegment untuk ke-4 sisi
+    function createWalls() {
+      const wallMaterial = new THREE.MeshBasicMaterial({ color: 0xd6c8b8 });
+      const segmentWidth  = 500;
+      const segmentHeight = 400;
+      const segmentDepth  = 15;
+
+      // Parameter pintu di sisi depan
+      const doorWidth     = 70;
+      const doorHeight    = 450;
+      const doorYPosition = -200;
+      const posOffset     = segmentWidth / 2;
+
+      // Dinding kiri (x = -30)
+      createWallSegment({
+        wallMaterial,
+        segmentWidth,
+        segmentHeight,
+        segmentDepth,
+        direction: 'left',
+        positionOffset: posOffset,
+        hasDoor: false
+      });
+
+      // Dinding kanan (x = +30)
+      createWallSegment({
+        wallMaterial,
+        segmentWidth,
+        segmentHeight,
+        segmentDepth,
+        direction: 'right',
+        positionOffset: posOffset,
+        hasDoor: false
+      });
+
+      // Dinding belakang (z = -30)
+      createWallSegment({
+        wallMaterial,
+        segmentWidth,
+        segmentHeight,
+        segmentDepth,
+        direction: 'back',
+        positionOffset: posOffset,
+        hasDoor: false
+      });
+
+      // Dinding depan (z = +30) dengan pintu
+      createWallSegment({
+        wallMaterial,
+        segmentWidth,
+        segmentHeight,
+        segmentDepth,
+        direction: 'front',
+        positionOffset: posOffset,
+        hasDoor: true,
+        doorWidth,
+        doorHeight,
+        doorYPosition
+      });
+    }
+
+    // ======================================================
+    // Fungsi untuk membuat lantai
+    function createFloor() {
+      // Ulang-ulang tekstur lantai
+      albedoTextureFloor1.repeat.set(20, 20); // Memperbesar pengulangan tekstur
+
+      const geometry = new THREE.PlaneGeometry(500, 500); // Memperbesar ukuran lantai sesuai dengan dinding
+      const material = new THREE.MeshStandardMaterial({
+        map: albedoTextureFloor1,
+        side: THREE.DoubleSide
+      });
+      const floor = new THREE.Mesh(geometry, material);
+      floor.rotation.x = Math.PI / 2;
+      floor.position.y = -200;
+      floor.receiveShadow = true;
+      scene.add(floor);
+    }
+
+    // ======================================================
+    // Fungsi untuk membuat langit-langit (atap)
+    function createCeiling() {
+      const geometry = new THREE.PlaneGeometry(500, 500);
+      const material = new THREE.MeshBasicMaterial({
+        color: 0xf8e6d8,
+        side: THREE.DoubleSide
+      });
+      const ceiling = new THREE.Mesh(geometry, material);
+      ceiling.rotation.x = -Math.PI / 2;
+      ceiling.position.y = 200;     // Menaikkan posisi atap sesuai tinggi dinding baru
+      ceiling.receiveShadow = true;
+      scene.add(ceiling);
+    }
+
+    // ======================================================
+    // Variabel global untuk model Sofa & TV
+    const models = {
+      sofa: null,
+      tv: null,
+      smallTable: null,
+      door: null,
+      clock: null,
+      ac: null,
+      remoteControl: null,
+      ceilingFan: null,
+      cat: null  // Menambahkan cat
+    };
+
+    // Fungsi untuk memuat model Sofa
+    function loadSofa() {
+      const loader = new THREE.GLTFLoader();
+      loader.load(
+        'Sofa/scene.gltf',
+        function (gltf) {
+          models.sofa = gltf.scene;
+          models.sofa.name = "Sofa";
+          models.sofa.scale.set(0.7, 0.7, 0.7);
+          models.sofa.position.set(-120, -200, 0);
+          // Tambahkan rotasi sofa 90 derajat
+          models.sofa.rotation.y = Math.PI / 2;
+          models.sofa.traverse(child => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+          scene.add(models.sofa);
+          document.getElementById('status').textContent = 'Status: Sofa dimuat';
+        },
+        undefined,
+        function (error) {
+          console.error('Error loading sofa model:', error);
+          document.getElementById('status').textContent = 'Error: Gagal memuat sofa';
+        }
+      );
+    }
+
+    // Fungsi untuk memuat model Small Table
+    function loadSmallTable() {
+      const loader = new THREE.GLTFLoader();
+      loader.load(
+        // Path ke file scene.gltf di dalam folder small_Table
+        'Table/scene.gltf',
+        function (gltf) {
+          // Simpan scene-nya ke objek models.smallTable
+          models.smallTable = gltf.scene;
+          models.smallTable.name = "SmallTable";
+          models.smallTable.scale.set(174.1, 174.1, 174.1);
+          models.smallTable.position.set(0, -200, 0);
+          // Tambahkan rotasi meja 90 derajat
+          models.smallTable.rotation.y = Math.PI / 2;
+          models.smallTable.traverse(child => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+          
+          // Tambahkan ke scene
+          scene.add(models.smallTable);
+          
+          // Update status di DOM (misal ID 'status')
+          document.getElementById('status').textContent = 'Status: Sofa, TV & Small Table dimuat';
+        },
+        // Optional: progress callback—boleh diisi undefined jika tidak diperlukan
+        undefined,
+        // Error callback
+        function (error) {
+          console.error('Error loading Small Table model:', error);
+          document.getElementById('status').textContent = 'Error: Gagal memuat Small Table';
+        }
+      );
+    }
+
+    // Fungsi untuk memuat model pintu
+    function loadDoor() {
+      const loader = new THREE.GLTFLoader();
+      loader.load(
+        'door/scene.gltf',
+        function (gltf) {
+          models.door = gltf.scene;
+          models.door.name = "Door";
+          
+          // Sesuaikan skala pintu dengan ukuran lubang di dinding
+          models.door.scale.set(0.7, 0.7 * 1.5, 0.7);
+          
+          // Posisikan pintu tepat di lubang dinding
+          models.door.position.set(0, -200, 250);
+          
+          // Rotasi pintu 360 derajat
+          models.door.rotation.y = 2 * Math.PI;
+          
+          // Aktifkan shadow untuk setiap mesh di pintu
+          models.door.traverse(child => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+          
+          scene.add(models.door);
+          document.getElementById('status').textContent = 'Status: Pintu dimuat';
+        },
+        undefined,
+        function (error) {
+          console.error('Error loading door model:', error);
+          document.getElementById('status').textContent = 'Error: Gagal memuat pintu';
+        }
+      );
+    }
+
+    // Fungsi untuk memuat model TV
+    function loadTV() {
+      const loader = new THREE.GLTFLoader();
+      loader.load(
+        'Tv/scene.gltf',
+        function (gltf) {
+          models.tv = gltf.scene;
+          models.tv.name = "TV";
+          models.tv.scale.set(174.1, 174.1, 174.1);
+          // Tempatkan TV di atas meja
+          models.tv.position.set(
+            230,    // x: posisi horizontal (- = ke kiri dari tengah, + = ke kanan dari tengah ruangan)
+            100,     // y: ketinggian dari lantai/meja (- = lebih rendah, + = lebih tinggi)
+            -440    // z: jarak dari depan/belakang (- = ke belakang/dalam ruangan, + = ke depan/luar ruangan)
+          );
+          // Rotasi TV 270 derajat
+          models.tv.rotation.y = (3/2) * Math.PI;
+          models.tv.traverse(child => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+          scene.add(models.tv);
+          document.getElementById('status').textContent = 'Status: Sofa & TV dimuat';
+        },
+        undefined,
+        function (error) {
+          console.error('Error loading TV model:', error);
+          document.getElementById('status').textContent = 'Error: Gagal memuat TV';
+        }
+      );
+    }
+
+    // Fungsi untuk memuat model jam dinding
+    function loadClock() {
+      const loader = new THREE.GLTFLoader();
+      loader.load(
+        'wall_clock/scene.gltf',
+        function (gltf) {
+          models.clock = gltf.scene;
+          models.clock.name = "WallClock";
+          
+          // Sesuaikan skala jam
+          models.clock.scale.set(0.1, 0.1, 0.1);
+          
+          // Posisikan jam di dinding
+          models.clock.position.set(
+            0,    // x: posisi horizontal (- ke kiri, + ke kanan)
+            50,   // y: posisi vertikal (- ke bawah, + ke atas)
+            -200   // z: posisi depan/belakang (- ke belakang, + ke depan)
+          );
+          
+          // Rotasi jam sebanyak 360 derajat
+          models.clock.rotation.y = 2 * Math.PI; // Rotasi penuh (360 derajat)
+          
+          // Aktifkan shadow untuk setiap mesh di jam
+          models.clock.traverse(child => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+          
+          scene.add(models.clock);
+          document.getElementById('status').textContent = 'Status: Jam dimuat';
+        },
+        undefined,
+        function (error) {
+          console.error('Error loading clock model:', error);
+          document.getElementById('status').textContent = 'Error: Gagal memuat jam';
+        }
+      );
+    }
+
+    // Fungsi untuk memuat model AC
+    function loadAc() {
+      const loader = new THREE.GLTFLoader();
+      loader.load(
+        'air_condition_daikin/scene.gltf',
+        function (gltf) {
+          models.ac = gltf.scene;
+          models.ac.name = "AirConditioner";
+          
+          // Sesuaikan skala AC
+          models.ac.scale.set(108.0, 108.0, 108.0);
+          
+          // Posisikan AC di dinding dengan komentar detail
+          models.ac.position.set(
+            -220,      // x: posisi horizontal (- = kiri dari tengah, + = kanan dari tengah)
+            100,    // y: ketinggian dari lantai (- = turun, + = naik)
+            0    // z: jarak dari depan/belakang (- = ke belakang/dalam, + = ke depan/luar)
+          );
+          
+          // Rotasi AC sebanyak 90 derajat
+          models.ac.rotation.y = Math.PI / 2; // Rotasi 90 derajat (seperempat putaran)
+          
+          models.ac.traverse(child => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+          
+          scene.add(models.ac);
+          document.getElementById('status').textContent = 'Status: AC dimuat';
+        },
+        undefined,
+        function (error) {
+          console.error('Error loading AC model:', error);
+          document.getElementById('status').textContent = 'Error: Gagal memuat AC';
+        }
+      );
+    }
+
+    // Fungsi untuk memuat model Remote Control
+    function loadRemoteControl() {
+      const loader = new THREE.GLTFLoader();
+      loader.load(
+        'remote_control/scene.gltf',
+        function (gltf) {
+          models.remoteControl = gltf.scene;
+          models.remoteControl.name = "RemoteControl";
+          
+          // Sesuaikan skala Remote
+          models.remoteControl.scale.set(0.20, 0.20, 0.20);
+          
+          // Posisikan Remote di atas meja dengan komentar detail
+          models.remoteControl.position.set(
+            0,      // x: posisi horizontal (- = kiri dari tengah, + = kanan dari tengah)
+            -130,   // y: ketinggian dari lantai/meja (- = turun, + = naik)
+            0       // z: jarak dari depan/belakang (- = ke belakang, + = ke depan)
+          );
+          
+          // Rotasi Remote Control (dalam radian)
+          models.remoteControl.rotation.x = 50; // Rotasi sumbu X: mengatur kemiringan depan-belakang (mengangguk)
+          models.remoteControl.rotation.y = 100; // Rotasi sumbu Y: mengatur arah hadap kiri-kanan (menggeleng)
+          models.remoteControl.rotation.z = 200;   // Rotasi sumbu Z: mengatur kemiringan kiri-kanan (memutar)
+          
+          models.remoteControl.traverse(child => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+          
+          scene.add(models.remoteControl);
+          document.getElementById('status').textContent = 'Status: Remote Control dimuat';
+        },
+        undefined,
+        function (error) {
+          console.error('Error loading Remote Control model:', error);
+          document.getElementById('status').textContent = 'Error: Gagal memuat Remote Control';
+        }
+      );
+    }
+
+    // Fungsi untuk memuat model Ceiling Fan
+    function loadCeilingFan() {
+      const loader = new THREE.GLTFLoader();
+      loader.load(
+        'ceiling_fan/scene.gltf',
+        function (gltf) {
+          models.ceilingFan = gltf.scene;
+          models.ceilingFan.name = "CeilingFan";
+          
+          // Sesuaikan skala Ceiling Fan
+          models.ceilingFan.scale.set(11.4, 11.4, 11.4);
+          
+          // Posisikan Ceiling Fan di langit-langit dengan komentar detail
+          models.ceilingFan.position.set(
+            0,        // x: posisi horizontal (0 = tepat di tengah ruangan)
+            150,      // y: ketinggian dari lantai (dekat dengan langit-langit)
+            0         // z: jarak dari depan/belakang (0 = tepat di tengah ruangan)
+          );
+          
+          // Rotasi Ceiling Fan (dalam radian)
+          models.ceilingFan.rotation.x = 0;     // Tidak ada rotasi pada sumbu X
+          models.ceilingFan.rotation.y = 0;     // Tidak ada rotasi pada sumbu Y
+          models.ceilingFan.rotation.z = 0;     // Tidak ada rotasi pada sumbu Z
+          
+          models.ceilingFan.traverse(child => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+          
+          scene.add(models.ceilingFan);
+          document.getElementById('status').textContent = 'Status: Ceiling Fan dimuat';
+        },
+        undefined,
+        function (error) {
+          console.error('Error loading Ceiling Fan model:', error);
+          document.getElementById('status').textContent = 'Error: Gagal memuat Ceiling Fan';
+        }
+      );
+    }
+
+    // ======================================================
+    // Inisialisasi semua (Sofa, TV, dinding, lantai, atap)
+    function initScene() {
+      loadSofa();
+      loadTV();
+      createWalls();
+      createFloor();
+      loadSmallTable();
+      loadDoor();
+      loadClock();
+      loadAc();
+      loadRemoteControl();
+      loadCeilingFan();
+      // loadCat();
+      createCeiling();
+    }
+
+    // ======================================================
+    // Kontrol UI: Reset Kamera
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      camera.position.set(0, 50, 150);
+      camera.lookAt(0, 0, 0);
+    });
+
+    // Kontrol UI: Toggle Lampu
+    document.getElementById('toggleLight').addEventListener('click', () => {
+      dirLight.visible = !dirLight.visible;
+    });
+
+    // Kontrol skala Sofa
+    const sofaScaleSlider = document.getElementById('sofaScale');
+    const sofaScaleValue  = document.getElementById('sofaScaleValue');
+    sofaScaleSlider.addEventListener('input', () => {
+      const scaleValue = parseFloat(sofaScaleSlider.value);
+      sofaScaleValue.textContent = scaleValue.toFixed(1);
+      if (models.sofa) {
+        models.sofa.scale.set(scaleValue, scaleValue, scaleValue);
+      }
+    });
+
+    // Kontrol skala TV
+    const tvScaleSlider = document.getElementById('tvScale');
+    const tvScaleValue = document.getElementById('tvScaleValue');
+    tvScaleSlider.addEventListener('input', () => {
+      const scaleValue = parseFloat(tvScaleSlider.value);
+      tvScaleValue.textContent = scaleValue.toFixed(1);
+      if (models.tv) {
+        models.tv.scale.set(scaleValue, scaleValue, scaleValue);
+      }
+    });
+
+    // Kontrol skala Pintu
+    const doorScaleSlider = document.getElementById('doorScale');
+    const doorScaleValue  = document.getElementById('doorScaleValue');
+    doorScaleSlider.addEventListener('input', () => {
+      const scaleValue = parseFloat(doorScaleSlider.value);
+      doorScaleValue.textContent = scaleValue.toFixed(1);
+      if (models.door) {
+        models.door.scale.set(scaleValue, scaleValue * 1.5, scaleValue);
+      }
+    });
+
+    // Kontrol skala Jam
+    const clockScaleSlider = document.getElementById('clockScale');
+    const clockScaleValue = document.getElementById('clockScaleValue');
+    clockScaleSlider.addEventListener('input', () => {
+      const scaleValue = parseFloat(clockScaleSlider.value);
+      clockScaleValue.textContent = scaleValue.toFixed(1);
+      if (models.clock) {
+        models.clock.scale.set(scaleValue, scaleValue, scaleValue);
+      }
+    });
+
+    // Tambahkan event listener untuk slider AC dan Remote
+    const acScaleSlider = document.getElementById('acScale');
+    const acScaleValue = document.getElementById('acScaleValue');
+    acScaleSlider.addEventListener('input', () => {
+      const scaleValue = parseFloat(acScaleSlider.value);
+      acScaleValue.textContent = scaleValue.toFixed(1);
+      if (models.ac) {
+        models.ac.scale.set(scaleValue, scaleValue, scaleValue);
+      }
+    });
+
+    const remoteScaleSlider = document.getElementById('remoteScale');
+    const remoteScaleValue = document.getElementById('remoteScaleValue');
+    remoteScaleSlider.addEventListener('input', () => {
+      const scaleValue = parseFloat(remoteScaleSlider.value);
+      remoteScaleValue.textContent = scaleValue.toFixed(2);
+      if (models.remoteControl) {
+        models.remoteControl.scale.set(scaleValue, scaleValue, scaleValue);
+      }
+    });
+
+    // Event listener untuk slider Ceiling Fan
+    const fanScaleSlider = document.getElementById('fanScale');
+    const fanScaleValue = document.getElementById('fanScaleValue');
+    fanScaleSlider.addEventListener('input', () => {
+      const scaleValue = parseFloat(fanScaleSlider.value);
+      fanScaleValue.textContent = scaleValue.toFixed(1);
+      if (models.ceilingFan) {
+        models.ceilingFan.scale.set(scaleValue, scaleValue, scaleValue);
+      }
+    });
+
+    // Fungsi untuk toggle status kipas
+    function toggleFan() {
+      isFanRotating = !isFanRotating;
+      document.getElementById('status').textContent = `Status: Kipas ${isFanRotating ? 'berputar' : 'berhenti'}`;
+    }
+
+    // Fungsi untuk mengupdate rotasi kipas
+    function updateFanRotation() {
+      if (models.ceilingFan && isFanRotating) {
+        // Rotasi pada sumbu Y (berputar horizontal)
+        models.ceilingFan.rotation.y += fanRotationSpeed;
+      }
+    }
+
+    // Event listener untuk tombol Toggle Kipas di UI
+    document.getElementById('toggleFan').addEventListener('click', toggleFan);
+
+    // Resize handler
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Variabel untuk animasi kucing
+    let isCatAnimating = true;
+    let catWalkDirection = 1; // 1 = maju, -1 = mundur
+    const catWalkSpeed = 2;
+    const catWalkLimit = 200; // Batas jarak berjalan
+    
+    // Fungsi untuk memuat model Cat
+    function loadCat() {
+      const loader = new THREE.GLTFLoader();
+      loader.load(
+        'Cat_walk/scene.gltf',
+        function (gltf) {
+          models.cat = gltf.scene;
+          models.cat.name = "Cat";
+          
+          // Sesuaikan skala Cat
+          models.cat.scale.set(5.0, 5.0, 5.0);
+          
+          // Posisikan Cat di lantai dengan komentar detail
+          models.cat.position.set(
+            0,        // x: posisi horizontal (0 = tepat di tengah ruangan)
+            -190,    // y: ketinggian dari lantai (sedikit di atas lantai)
+            0        // z: jarak dari depan/belakang (0 = tepat di tengah ruangan)
+          );
+          
+          // Rotasi Cat menghadap ke depan
+          models.cat.rotation.y = Math.PI / 2; // Rotasi 90 derajat
+          
+          // Aktifkan shadows untuk semua mesh dalam model
+          models.cat.traverse(child => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+          
+          scene.add(models.cat);
+          document.getElementById('status').textContent = 'Status: Kucing dimuat';
+        },
+        undefined,
+        function (error) {
+          console.error('Error loading Cat model:', error);
+          document.getElementById('status').textContent = 'Error: Gagal memuat kucing';
+        }
+      );
+    }
+
+    // Fungsi untuk mengupdate posisi kucing
+    function updateCatPosition() {
+      if (models.cat && isCatAnimating) {
+        // Update posisi berdasarkan arah
+        models.cat.position.x += catWalkSpeed * catWalkDirection;
+        
+        // Cek batas jalan dan balik arah
+        if (Math.abs(models.cat.position.x) > catWalkLimit) {
+          catWalkDirection *= -1; // Balik arah
+          // Balik rotasi kucing
+          models.cat.rotation.y = catWalkDirection > 0 ? Math.PI / 2 : -Math.PI / 2;
+        }
+      }
+    }
+
+    // Event listener untuk tombol Toggle Animasi Kucing
+    document.getElementById('toggleAnimation').addEventListener('click', () => {
+      isCatAnimating = !isCatAnimating;
+      document.getElementById('status').textContent = `Status: Kucing ${isCatAnimating ? 'berjalan' : 'berhenti'}`;
+    });
+
+    // Update fungsi animate untuk menambahkan animasi kucing
+    function animate() {
+      requestAnimationFrame(animate);
+      updateCamera();
+      updateFanRotation();
+      updateCatPosition(); // Tambahkan update posisi kucing
+      renderer.render(scene, camera);
+    }
+
+    // Mulai semuanya
+    initScene();
+    animate();
+  </script>
+</body>
+</html>
